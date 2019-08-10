@@ -1,0 +1,16 @@
+Metrics/LineLength:
+  Max: 80
+  IgnoredPatterns: ['(\A|\s)#']
+
+Style/EmptyMethod:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/SymbolArray:
+  Enabled: false
+
+Layout/IndentFirstHashElement:
+  Enabled: false
+  EnforcedStyle: consistent
