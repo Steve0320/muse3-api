@@ -7,4 +7,8 @@ class MediaGroup < ApplicationRecord
 
   has_many :media_files, dependent: :destroy
 
+  validates :name, presence: true
+  validates :from_searcher, presence: true
+  validates :searcher_key, presence: true
+
 end

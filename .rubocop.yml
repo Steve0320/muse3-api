@@ -14,3 +14,6 @@ Style/SymbolArray:
 Layout/IndentFirstHashElement:
   Enabled: false
   EnforcedStyle: consistent
+
+Style/RedundantReturn:
+  Enabled: false

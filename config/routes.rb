@@ -10,6 +10,9 @@ Rails.application.routes.draw do
       # GET /search/processors gets the list of available values for p
       get '/search/processors', to: 'searches#list_processors'
 
+      # GET /search/by_id?k=... gets the full listing for a key
+      get '/search/by_key', to: 'searches#search_by_key'
+
     end
 
   end

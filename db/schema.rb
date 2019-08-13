@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_10_072034) do
+ActiveRecord::Schema.define(version: 2019_08_13_002805) do
 
   create_table "media_files", force: :cascade do |t|
     t.integer "media_group_id"
@@ -22,6 +22,12 @@ ActiveRecord::Schema.define(version: 2019_08_10_072034) do
   create_table "media_groups", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "name", null: false
+    t.string "description"
+    t.string "poster_url"
+    t.integer "rating"
+    t.string "from_searcher", null: false
+    t.string "searcher_key", null: false
   end
 
 end
