@@ -5,4 +5,8 @@ class MediaFile < ApplicationRecord
 
   belongs_to :media_group
 
+  serialize :extra_data, JSON
+
+  validates :name, presence: true
+
 end

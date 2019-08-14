@@ -24,6 +24,7 @@ module Api::V1
 
         results = klass.search(@query, @start, @max).map do |r|
           r.key = "#{klass_name}$#{r.key}"
+          # TODO: check validation of r
           r
         end
 
@@ -58,7 +59,8 @@ module Api::V1
       klass = klass_name.constantize
       result = klass.find(key)
 
-      render json: { result: result }
+      # TODO: override to_json in MediaFile and MediaGroup to exclude id, etc.
+      render json: { result: result }, include: :media_files
 
     end
 
