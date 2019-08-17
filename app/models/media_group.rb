@@ -9,11 +9,24 @@ class MediaGroup < ApplicationRecord
 
   # Store data that doesn't match up with the normal global fields.
   # This should always be a string->string hash as types are not preserved
-  serialize :extra_data, JSON
+  serialize :search_data, JSON
 
   validates :name, presence: true
   validates :searcher_key, presence: true
   # TODO: make sure this string is in the searchers array
   validates :from_searcher, presence: true
+
+  # Exclude private fields from JSON response
+  # Avoids a bug in overriding as_json
+  def serializable_hash(*)
+
+    excludes = ['id', 'created_at', 'updated_at', 'from_searcher', 'searcher_key']
+    output = super.except(*excludes)
+    output.merge!(search_data) if search_data
+
+    # Flatten the extra data fields into output
+    return output
+
+  end
 
 end

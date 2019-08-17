@@ -10,6 +10,10 @@ class TmdbTv
   RESULTS_PER_PAGE = 20
   POSTER_RESOLUTION = 'w185'.freeze
 
+  def self.description
+    'A searcher for the TV shows section of TheMovieDB.'
+  end
+
   # Return an array of results adhering to the SearchResult model. In debug mode, this array
   # will be validated by the searches controller. In normal mode, this will be skipped for
   # performance reasons. This method may throw an ExternalServiceError if the API cannot
@@ -34,7 +38,7 @@ class TmdbTv
       end
 
       # TODO: throw an exception if the request fails
-      raise 'Error: status was not 200' unless response.status == 200
+      raise 'External API failure' unless response.status == 200
 
       # TODO: break early if we run out of results
       c.concat(JSON.parse(response.body)['results'])
@@ -57,6 +61,8 @@ class TmdbTv
     # Get the initial information
     connection = setup_connection("tv/#{key}")
     response = connection.get
+
+    raise 'External API failure' unless response.status == 200
 
     # Extract the list of season numbers
     season_list = JSON.parse(response.body)['seasons']
@@ -90,15 +96,15 @@ class TmdbTv
     "https://image.tmdb.org/t/p/#{POSTER_RESOLUTION}/#{file_name}"
   end
 
+  def self.rating(raw_rating)
+    return (raw_rating * 10).round(half: :up)
+  end
+
   # Pack API data into full media structure, assuming appends format
   def self.to_media_structure(api_response)
 
     # Create root MediaGroup
-    root_group = MediaGroup.new(
-      name: api_response['name'],
-      description: api_response['overview'],
-      poster_url: poster_path(api_response['poster_path'])
-    )
+    root_group = to_media_group(api_response)
 
     # Merge all episode lists into a flat array
     seasons = api_response.select { |k, _v| k.include?('season/') }
@@ -107,14 +113,7 @@ class TmdbTv
     # Create MediaFiles from episodes
     episodes.each do |e|
 
-      file = MediaFile.new(
-        name: e['name'],
-        extra_data: {
-            season: e['season_number'],
-            episode: e['episode_number'],
-            overview: e['overview']
-        }
-      )
+      file = to_media_file(e)
 
       # Assign to relation without saving
       root_group.association(:media_files).add_to_target(file)
@@ -125,21 +124,43 @@ class TmdbTv
 
   end
 
-  # Pack a raw API data into the appropriate structure
+  # Conversion helpers
+
+  # Pack raw API data into a MediaGroup
+  def self.to_media_group(api_response)
+    return MediaGroup.new(
+      name: api_response['name'],
+      description: api_response['overview'],
+      poster_url: poster_path(api_response['poster_path']),
+      rating: rating(api_response['vote_average'])
+    )
+  end
+
+  # Pack raw API data into a MediaFile
+  def self.to_media_file(api_response)
+    return MediaFile.new(
+      name: api_response['name'],
+      search_data: {
+          season: api_response['season_number'],
+          episode: api_response['episode_number'],
+          overview: api_response['overview']
+      }
+    )
+  end
+
+  # Pack a raw API data into a SearchResult
   def self.to_search_result(api_response)
 
     poster_url = if api_response['poster_path']
                    poster_path(api_response['poster_path'])
                  end
 
-    rating = (api_response['vote_average'] * 10).round(half: :up)
-
     return SearchResult.new(
       key: api_response['id'],
       name: api_response['name'],
       description: api_response['overview'],
       poster_url: poster_url,
-      rating: rating
+      rating: rating(api_response['vote_average'])
     )
 
   end

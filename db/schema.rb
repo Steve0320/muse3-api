@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_14_054135) do
+ActiveRecord::Schema.define(version: 2019_08_15_051825) do
 
   create_table "media_files", force: :cascade do |t|
     t.integer "media_group_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "extra_data"
+    t.string "search_data"
     t.string "file_path"
     t.string "name", null: false
     t.index ["media_group_id"], name: "index_media_files_on_media_group_id"
@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(version: 2019_08_14_054135) do
     t.integer "rating"
     t.string "from_searcher", null: false
     t.string "searcher_key", null: false
-    t.string "extra_data"
+    t.string "search_data"
   end
 
 end
